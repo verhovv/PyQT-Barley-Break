@@ -2,8 +2,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-
-
 WINDOW_SIZE = WINDOW_WIDTH, WINDOW_HEIGHT = (600, 900)
 
 plates_width = 5
