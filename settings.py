@@ -1,34 +1,27 @@
-import sqlite3
-
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+# window size constants
 WINDOW_SIZE = WINDOW_WIDTH, WINDOW_HEIGHT = (600, 900)
 
+# plates size
 plates_width = 5
 plates_height = 5
-
 SIZE_OF_PLATE = int(WINDOW_WIDTH // max([plates_width, plates_height]) // 1.3)
 
+# margins
 PADDING = 2
 
+# coordinates of empty plate
 empty_plate_coords = [plates_width - 1, plates_height - 1]
 
+# fonts
 MAIN_FONT = QFont('Futurespore Cyrillic', 12)
+LINK_FONT = QFont('Futurespore Cyrillic', 8)
 
-main_image = None
-
-database = sqlite3.connect('data.db')
-cur = database.cursor()
-
-def record(size=plates_width * plates_height):
-    r = cur.execute(f"""
-            SELECT record FROM records
-            WHERE size={size}
-            """).fetchone()
-
-    return 0 if r is None else float(r[0])
+# main image
+mainImage = None
 
 
 class SettingsWindow(QMainWindow):
@@ -70,7 +63,7 @@ class SettingsWindow(QMainWindow):
                              self.widthChoice.y())
 
         self.path = QLineEdit(self)
-        self.path.setFont(MAIN_FONT)
+        self.path.setFont(LINK_FONT)
         self.path.move(self.heightChoice.x(),
                        self.heightChoice.y() - self.heightChoice.height() - 10)
         self.path.setEnabled(False)
@@ -87,7 +80,7 @@ class SettingsWindow(QMainWindow):
         self.applyButton.clicked.connect(self.onPress)
 
     def chooseImage(self):
-        global main_image
+        global mainImage
 
         path = QFileDialog.getOpenFileName(self, 'Выбрать изображение', '',
                                            'Изображения (*.png *.xpm *.jpg *.jpeg)')
@@ -101,8 +94,8 @@ class SettingsWindow(QMainWindow):
                                                'Изображения (*.png *.xpm *.jpg *.jpeg)')
             self.path.setText(path[0].split('/')[-1])
 
-        main_image = QImage(path[0])
-        return main_image
+        mainImage = QImage(path[0])
+        return mainImage
 
     def onPress(self):
         global plates_width, plates_height, SIZE_OF_PLATE, empty_plate_coords

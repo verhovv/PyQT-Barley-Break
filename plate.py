@@ -1,54 +1,61 @@
 import random
-
-from settings import *
-
 import time
+
+from database import *
+from settings import *
 
 
 class Plate(QPushButton):
+    # need flags
     is_started = False
     is_won = False
 
     # list of all plates
     plates: list['Plate'] = list()
 
-    def __init__(self, surface: QWidget, coords: list[int, int], pixmap: QPixmap):
+    def __init__(self, mainWindow: QWidget, coords: list[int, int], pixmap: QPixmap):
         from settings import SIZE_OF_PLATE
 
-        super().__init__(surface)
+        super().__init__(mainWindow)
 
-        self.surface = surface
+        # our main window
+        self.mainWindow = mainWindow
 
-        self.pixmap = pixmap
-
+        # plate coordinates
         self.coords = coords
         self.first_coords = self.coords.copy()
 
-        self.resize(SIZE_OF_PLATE + PADDING, SIZE_OF_PLATE + PADDING)
-        self.move_to_home()
-
-        self.distance = (self.coords[0] - empty_plate_coords[0], self.coords[1] - empty_plate_coords[1])
-
+        # setting the image of plate
+        self.pixmap = pixmap
         self.setIcon(QIcon(self.pixmap))
         self.setIconSize(self.pixmap.rect().size())
 
+        # resizing plate
+        self.resize(SIZE_OF_PLATE + PADDING, SIZE_OF_PLATE + PADDING)
+
+        # moving plate to its coordinates
+        self.move_to_home()
+
+        # distance from empty plate E[-1:1]
+        self.distance = (self.coords[0] - empty_plate_coords[0], self.coords[1] - empty_plate_coords[1])
+
+        # adding event on click on our plate-button
         self.clicked.connect(self.onClick)
 
-        self.start_time = time.time()
-
-        Plate.plates.append(self)
-
+        # timer setting
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.showTime)
+        self.time_counter = 0
 
-        self.second_count = 0
+        # adding plate to plates list
+        Plate.plates.append(self)
 
     # moving plate to its coordinates
     def move_to_home(self):
         from settings import plates_width, plates_height
 
-        self.move(self.surface.width() // 2 + self.coords[0] * self.width() - self.width() * plates_width // 2,
-                  self.surface.height() // 5 * 4 + self.coords[
+        self.move(self.mainWindow.width() // 2 + self.coords[0] * self.width() - self.width() * plates_width // 2,
+                  self.mainWindow.height() // 5 * 4 + self.coords[
                       1] * self.height() - self.height() * plates_height // 5 * 4)
 
     # animated moving
@@ -69,26 +76,31 @@ class Plate(QPushButton):
             if abs(self.distance[i]) > 1:
                 return False
 
-        # checking the 1:-1 distance cases
+        # checking the [1 == 1; -1 == -1] distance cases
         if abs(self.distance[0]) == abs(self.distance[1]):
             return False
 
         return True
 
+    # plate click event
     def onClick(self) -> None:
         from settings import empty_plate_coords
 
+        # distance from empty plate E[-1:1]
         self.distance = (self.coords[0] - empty_plate_coords[0], self.coords[1] - empty_plate_coords[1])
 
         if not self.can_move():
             return
 
+        # editing plate and empty plate coordinates
         for i in range(2):
             self.coords[i] -= self.distance[i]
             empty_plate_coords[i] += self.distance[i]
 
+        # moving the plate
         self.move_on(self.x() - self.width() * self.distance[0], self.y() - self.height() * self.distance[1])
 
+        # editing flags
         if self.check_is_won():
             Plate.is_won = True
 
@@ -96,32 +108,33 @@ class Plate(QPushButton):
             self.timer.start(100)
             Plate.is_started = True
 
+    # timer event
     def showTime(self) -> None:
         from settings import plates_height, plates_width
         if Plate.is_won:
             Plate.set_enabled(False)
 
-            if record(plates_height * plates_width) > self.second_count / 10 or record(
+            if record(plates_height * plates_width) > self.time_counter / 10 or record(
                     plates_height * plates_width) == 0:
                 cur.execute(f"""INSERT INTO records
-                VALUES({plates_width * plates_height}, {float(self.second_count / 10)})""")
+                VALUES({plates_width * plates_height}, {float(self.time_counter / 10)})""")
                 database.commit()
 
-                self.surface.record.setText(f"Рекорд: {self.second_count / 10}")
+                self.mainWindow.record.setText(f"Рекорд: {self.time_counter / 10}")
 
                 QMessageBox.about(self, 'Вы выиграли!!! НОВЫЙ РЕКОРД!!!',
-                                  f'Победа! Время: {self.second_count / 10} секунд!'
+                                  f'Победа! Время: {self.time_counter / 10} секунд!'
                                   f'\nНовый рекорд!')
             else:
-                QMessageBox.about(self, 'Вы выиграли!!!', f'Победа! Время: {self.second_count / 10} секунд!')
-            self.second_count = 0
+                QMessageBox.about(self, 'Вы выиграли!!!', f'Победа! Время: {self.time_counter / 10} секунд!')
+            self.time_counter = 0
 
         if not Plate.is_started or Plate.is_won:
             self.timer.stop()
             return
 
-        self.second_count += 1
-        self.surface.time.setText(f'Время: {self.second_count / 10} секунд')
+        self.time_counter += 1
+        self.mainWindow.timeLabel.setText(f'Время: {self.time_counter / 10} секунд')
 
     # checking if won
     @staticmethod
@@ -136,7 +149,7 @@ class Plate(QPushButton):
             plate.setEnabled(enabled)
 
     @staticmethod
-    def clear_plates() -> None:
+    def clear() -> None:
         for plate in Plate.plates:
             plate.setParent(None)
         Plate.plates.clear()
@@ -161,8 +174,6 @@ class Plate(QPushButton):
                     if coords[i] > coords[j]:
                         k += 1
             k += plates_height
-            print(k)
-        print(k)
 
         for i in range(len(Plate.plates)):
             Plate.plates[i].coords = coords[i]
