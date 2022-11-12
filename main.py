@@ -14,6 +14,11 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.time = QLabel('Время: 0', self)
+        self.time.resize(150, 25)
+        self.time.setFont(MAIN_FONT)
+        self.time.move(10, 20)
+
         self.setWindowTitle("PyQT Barley-Break")
 
         self.setMaximumSize(QSize(*WINDOW_SIZE))

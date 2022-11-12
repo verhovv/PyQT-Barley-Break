@@ -2,8 +2,13 @@ import random
 
 from settings import *
 
+import time
+
 
 class Plate(QPushButton):
+    is_started = False
+    is_won = False
+
     # list of all plates
     plates: list['Plate'] = list()
 
@@ -29,10 +34,14 @@ class Plate(QPushButton):
 
         self.clicked.connect(self.onClick)
 
-        self.winMessageBox = QMessageBox()
-        self.winMessageBox.setText('Вы выиграли!!!')
+        self.start_time = time.time()
 
         Plate.plates.append(self)
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.showTime)
+
+        self.second_count = 0
 
     # moving plate to its coordinates
     def move_to_home(self):
@@ -60,7 +69,7 @@ class Plate(QPushButton):
             if abs(self.distance[i]) > 1:
                 return False
 
-        # checking the 1-1 distance cases
+        # checking the 1:-1 distance cases
         if abs(self.distance[0]) == abs(self.distance[1]):
             return False
 
@@ -78,15 +87,32 @@ class Plate(QPushButton):
             self.coords[i] -= self.distance[i]
             empty_plate_coords[i] += self.distance[i]
 
-        if self.check_is_won():
-            self.winMessageBox.exec()
-
         self.move_on(self.x() - self.width() * self.distance[0], self.y() - self.height() * self.distance[1])
+
+        if self.check_is_won():
+            QMessageBox.about(self, 'Вы выиграли!!!', f'Победа! Время: {self.second_count / 10} секунд!')
+
+            self.second_count = 0
+            Plate.is_won = True
+
+        if not Plate.is_started:
+            self.timer.start(100)
+            Plate.is_started = True
+
+    def showTime(self) -> None:
+        if not Plate.is_started or Plate.is_won:
+            self.timer.stop()
+            self.surface.time.setText(f'Время: 0 секунд')
+            return
+
+        self.second_count += 1
+        self.surface.time.setText(f'Время: {self.second_count / 10} секунд')
 
     # checking if won
     @staticmethod
     def check_is_won() -> bool:
-        if sorted(Plate.plates, key=lambda x: x.coords) == Plate.plates:
+        if tuple(map(lambda x: x.first_coords, Plate.plates)) == tuple(map(lambda x: x.coords, Plate.plates)):
+            print(123)
             return True
         return False
 
@@ -97,17 +123,27 @@ class Plate(QPushButton):
         Plate.plates.clear()
 
     @staticmethod
+    # generating new plates
     def generate_plates() -> None:
         from settings import plates_width, plates_height
 
-        coords = list()
-        for x in range(plates_width):
-            for y in range(plates_height):
-                if x == plates_width - 1 and y == plates_height - 1:
-                    continue
-                coords.append([x, y])
+        Plate.is_won = False
+        Plate.is_started = False
 
-        random.shuffle(coords)
+        coords = list(([x, y] for x in range(plates_width) for y in range(plates_height)))[:-1]
+        print(coords)
+        k = 0
+        while not k % 2:
+            k = 0
+            random.shuffle(coords)
+
+            for i in range(len(coords)):
+                for j in range(i + 1, len(coords)):
+                    if coords[i] > coords[j]:
+                        k += 1
+            k += plates_height
+            print(k, k % 2)
+        print(k, k % 2)
 
         for i in range(len(Plate.plates)):
             Plate.plates[i].coords = coords[i]
