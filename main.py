@@ -62,7 +62,7 @@ class Window(QMainWindow):
 
     # Generating new plates
     def make_plates(self) -> None:
-        from settings import SIZE_OF_PLATE, plates_width, plates_height, mainImage
+        from settings import SIZE_OF_PLATE, plates_width, plates_height, mainImage, empty_plate_coords
 
         # resizing image to resolution we need
         image = mainImage.scaled(plates_width * SIZE_OF_PLATE, plates_height * SIZE_OF_PLATE)
@@ -100,6 +100,9 @@ class Window(QMainWindow):
         # setting labels text
         self.timeLabel.setText(f'Время: 0 секунд')
         self.recordLabel.setText(f'Рекорд: {record(plates_width * plates_height)}')
+
+        empty_plate_coords[0] = plates_width - 1
+        empty_plate_coords[1] = plates_height - 1
 
 
 if __name__ == '__main__':

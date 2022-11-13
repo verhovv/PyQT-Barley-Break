@@ -169,7 +169,8 @@ class Plate(QPushButton):
     @staticmethod
     # generating new plates
     def generate_plates() -> None:
-        from settings import plates_width, plates_height
+        from settings import plates_width, plates_height, empty_plate_coords
+        global empty_plate_coords
 
         # setting flags
         Plate.is_won = False
@@ -199,7 +200,3 @@ class Plate(QPushButton):
             Plate.plates[i].coords = coords[i]
             Plate.plates[i].move_to_home()
             Plate.plates[i].show()
-
-        # setting empty plate coordinates
-        empty_plate_coords[0] = plates_width - 1
-        empty_plate_coords[1] = plates_height - 1

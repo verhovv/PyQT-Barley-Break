@@ -103,6 +103,5 @@ class SettingsWindow(QMainWindow):
         plates_height = self.heightChoice.value()
 
         SIZE_OF_PLATE = int(WINDOW_WIDTH // max([plates_width, plates_height]) // 1.3)
-        empty_plate_coords = [plates_width - 1, plates_height - 1]
 
         self.hide()
