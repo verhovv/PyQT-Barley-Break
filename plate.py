@@ -111,29 +111,39 @@ class Plate(QPushButton):
     # timer event
     def showTime(self) -> None:
         from settings import plates_height, plates_width
+        # setting plates enable to false if won
         if Plate.is_won:
             Plate.set_enabled(False)
 
+            #  if new record
             if record(plates_height * plates_width) > self.time_counter / 10 or record(
                     plates_height * plates_width) == 0:
+                # adding new record
                 cur.execute(f"""INSERT INTO records
                 VALUES({plates_width * plates_height}, {float(self.time_counter / 10)})""")
                 database.commit()
 
-                self.mainWindow.record.setText(f"Рекорд: {self.time_counter / 10}")
+                # editing recordLabel
+                self.mainWindow.recordLabel.setText(f"Рекорд: {self.time_counter / 10}")
 
+                # showing message box
                 QMessageBox.about(self, 'Вы выиграли!!! НОВЫЙ РЕКОРД!!!',
                                   f'Победа! Время: {self.time_counter / 10} секунд!'
                                   f'\nНовый рекорд!')
             else:
+                # showing message box if not new record
                 QMessageBox.about(self, 'Вы выиграли!!!', f'Победа! Время: {self.time_counter / 10} секунд!')
             self.time_counter = 0
 
+        # stop timer condition
         if not Plate.is_started or Plate.is_won:
             self.timer.stop()
             return
 
+        # counting time
         self.time_counter += 1
+
+        # editing timeLabel
         self.mainWindow.timeLabel.setText(f'Время: {self.time_counter / 10} секунд')
 
     # checking if won
@@ -143,11 +153,13 @@ class Plate(QPushButton):
             return True
         return False
 
+    # setting enable to the all plates
     @staticmethod
     def set_enabled(enabled: bool) -> None:
         for plate in Plate.plates:
             plate.setEnabled(enabled)
 
+    # clearing all plates
     @staticmethod
     def clear() -> None:
         for plate in Plate.plates:
@@ -159,26 +171,35 @@ class Plate(QPushButton):
     def generate_plates() -> None:
         from settings import plates_width, plates_height
 
+        # setting flags
         Plate.is_won = False
         Plate.is_started = False
 
+        # just all coordinates
         coords = list(([x, y] for x in range(plates_width) for y in range(plates_height)))[:-1]
 
+        # generating plate coordinates
+        # while it's impossible to finish
         k = 0 if plates_height % 2 else 1
         while (not k % 2) if plates_height % 2 else k % 2:
             k = 0
+
+            # mixing the coordinates
             random.shuffle(coords)
 
             for i in range(len(coords)):
                 for j in range(i + 1, len(coords)):
                     if coords[i] > coords[j]:
                         k += 1
+
             k += plates_height
 
+        # setting new coordinates to plates
         for i in range(len(Plate.plates)):
             Plate.plates[i].coords = coords[i]
             Plate.plates[i].move_to_home()
             Plate.plates[i].show()
 
+        # setting empty plate coordinates
         empty_plate_coords[0] = plates_width - 1
         empty_plate_coords[1] = plates_height - 1

@@ -1,6 +1,6 @@
-# database initialization
 import sqlite3
 
+# database initialization
 database = sqlite3.connect('data.db')
 cur = database.cursor()
 
