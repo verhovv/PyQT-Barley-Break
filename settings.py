@@ -31,7 +31,7 @@ class SettingsWindow(QMainWindow):
     def __init__(self):
         # initializing font
         self.fontDB = QFontDatabase()
-        self.fontDB.addApplicationFont("font.otf")
+        self.fontDB.addApplicationFont("assets/fonts/font.otf")
 
         super().__init__()
 
