@@ -1,8 +1,14 @@
 import sqlite3
 
 # database initialization
-database = sqlite3.connect('data.db')
+database = sqlite3.connect('assets/data.db')
 cur = database.cursor()
+
+cur.execute("""
+    CREATE TABLE IF NOT EXISTS records (
+    size INT, record INT
+    )
+""")
 
 
 # returning record from database

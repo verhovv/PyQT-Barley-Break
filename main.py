@@ -31,16 +31,13 @@ class Window(QMainWindow):
         self.setWindowTitle("PyQT Barley-Break")
         self.setMaximumSize(QSize(*WINDOW_SIZE))
         self.setMinimumSize(QSize(*WINDOW_SIZE))
-        self.setWindowIcon(QIcon(QPixmap(QImage('icon.png'))))
+        self.setWindowIcon(QIcon(QPixmap(QImage('assets/images/icon.png'))))
 
         # initializing imageButton (to put small version of image here)
         self.imageButton = QPushButton(self)
 
         # initializing the settingWindow from settings.py
         self.settingWindow = SettingWindow()
-
-        # taking mainImage from the file dialog
-        self.settingWindow.chooseImage()
 
         # settingButton setting
         self.settingButton = QPushButton('Настройки', self)
@@ -87,7 +84,7 @@ class Window(QMainWindow):
                 # creating all plates (adding to Plate.plates)
                 Plate(self, [x, y], pixmap)
 
-        # deleting the last one of the plates
+        # deleting the last plate
         Plate.plates[-1].setParent(None)
         Plate.plates = Plate.plates[:-1]
 

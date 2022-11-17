@@ -21,7 +21,8 @@ MAIN_FONT = QFont('Futurespore Cyrillic', 12)
 LINK_FONT = QFont('Futurespore Cyrillic', 8)
 
 # main image
-mainImage = None
+mainImage = QImage('assets/images/pazzle.jpg')
+image = QImage(mainImage)
 
 
 class SettingsWindow(QMainWindow):
