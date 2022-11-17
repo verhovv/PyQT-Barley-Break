@@ -45,14 +45,14 @@ class SettingsWindow(QMainWindow):
         self.heightChoice.move(self.width() // 3 * 2 - self.heightChoice.width() // 2,
                                self.height() // 5 * 3 - self.heightChoice.height() - 30)
         self.heightChoice.setMinimum(3)
-        self.heightChoice.setMaximum(50)
+        self.heightChoice.setMaximum(20)
         self.heightChoice.setValue(plates_height)
 
         self.widthChoice = QSpinBox(self)
         self.widthChoice.move(self.heightChoice.x(),
                               self.heightChoice.y() + self.heightChoice.height() + 10)
         self.widthChoice.setMinimum(3)
-        self.widthChoice.setMaximum(50)
+        self.widthChoice.setMaximum(20)
         self.widthChoice.setValue(plates_width)
 
         # labels settings
