@@ -45,9 +45,9 @@ class Window(QMainWindow):
         self.settingButton.move(WINDOW_WIDTH - self.settingButton.width() - 10, 10)
 
         # regenerateButton setting
-        self.regenerateButton = QPushButton('Пересобрать\n↺', self)
-        self.regenerateButton.resize(75, 75)
-        self.regenerateButton.move(self.settingButton.x() + 12,
+        self.regenerateButton = QPushButton('Пересобрать', self)
+        self.regenerateButton.resize(self.settingButton.size())
+        self.regenerateButton.move(self.settingButton.x(),
                                    self.settingButton.y() + self.settingButton.height() + 10)
         self.regenerateButton.clicked.connect(self.make_plates)
 
