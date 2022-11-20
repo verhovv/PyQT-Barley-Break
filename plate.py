@@ -60,15 +60,12 @@ class Plate(QPushButton):
     def move_to_home(self):
         from settings import plates_width, plates_height
 
-        self.move(self.mainWindow.width() // 2 + self.coords[0] * self.width() - self.width() * plates_width // 2,
-                  self.mainWindow.height() // 5 * 4 + self.coords[
-                      1] * self.height() - self.height() * plates_height // 5 * 4)
+        self.move_on(self.mainWindow.width() // 2 + self.coords[0] * self.width() - self.width() * plates_width // 2,
+                     self.mainWindow.height() // 5 * 4 + self.coords[
+                         1] * self.height() - self.height() * plates_height // 5 * 4)
 
     # animated moving
     def move_on(self, x, y) -> None:
-
-        self.isMoving = True
-
         # animation properties
         self.anim = QPropertyAnimation(self, b"geometry")
         self.anim.setDuration(100)
