@@ -15,17 +15,24 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # timeLabel setting
+        # labels setting
         self.timeLabel = QLabel('Время: 0', self)
         self.timeLabel.resize(150, 25)
         self.timeLabel.setFont(MAIN_FONT)
         self.timeLabel.move(10, 20)
 
-        # recordLabel setting
         self.recordLabel = QLabel(f'Рекорд: {record(plates_width * plates_height)}', self)
         self.recordLabel.resize(150, 25)
         self.recordLabel.setFont(MAIN_FONT)
         self.recordLabel.move(self.timeLabel.x(), self.timeLabel.y() + 15)
+
+        self.advice = QLabel('Нажмите "Alt", чтобы увидеть правильное расположение', self)
+        self.advice.setFont(MAIN_FONT)
+        self.advice.resize(MAIN_FONT.pointSize() * len(self.advice.text()),
+                           MAIN_FONT.pointSize() + 5)
+        self.advice.move(self.width() // 2 - self.advice.width() // 2,
+                         3
+                         )
 
         # main window setting
         self.setWindowTitle("PyQT Barley-Break")
