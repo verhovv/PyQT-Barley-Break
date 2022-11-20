@@ -82,7 +82,7 @@ class Window(QMainWindow):
                 )
 
                 # creating all plates (adding to Plate.plates)
-                Plate(self, [x, y], pixmap)
+                Plate(f'{y * plates_width + x + 1}', self, [x, y], pixmap)
 
         # deleting the last plate
         Plate.plates[-1].setParent(None)
@@ -97,6 +97,8 @@ class Window(QMainWindow):
         # setting labels text
         self.timeLabel.setText(f'Время: 0 секунд')
         self.recordLabel.setText(f'Рекорд: {record(plates_width * plates_height)}')
+        self.recordLabel.resize(MAIN_FONT.pointSize() * len(self.timeLabel.text()),
+                                MAIN_FONT.pointSize() + 5)
 
         empty_plate_coords[0] = plates_width - 1
         empty_plate_coords[1] = plates_height - 1

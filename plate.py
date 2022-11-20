@@ -1,8 +1,9 @@
 import random
-import time
 
 from database import *
 from settings import *
+
+import keyboard
 
 
 class Plate(QPushButton):
@@ -13,10 +14,15 @@ class Plate(QPushButton):
     # list of all plates
     plates: list['Plate'] = list()
 
-    def __init__(self, mainWindow: QWidget, coords: list[int, int], pixmap: QPixmap):
-        from settings import SIZE_OF_PLATE
+    def __init__(self, name, mainWindow: QWidget, coords: list[int, int], pixmap: QPixmap):
+        from settings import SIZE_OF_PLATE, plates_width, plates_height
 
         super().__init__(mainWindow)
+
+        keyboard.add_hotkey('Alt', self.keyboard_handler)
+        keyboard.on_release(self.keyboard_handler)
+
+        self.name = name
 
         # our main window
         self.mainWindow = mainWindow
@@ -60,14 +66,27 @@ class Plate(QPushButton):
 
     # animated moving
     def move_on(self, x, y) -> None:
+
+        self.isMoving = True
+
         # animation properties
         self.anim = QPropertyAnimation(self, b"geometry")
         self.anim.setDuration(100)
-        self.anim.setStartValue(self.geometry())
+        self.anim.setStartValue(QRect(self.x(), self.y(), self.width(), self.height()))
         self.anim.setEndValue(QRect(x, y, self.width(), self.height()))
 
         # starting the animation
         self.anim.start()
+
+    # keyboard handler
+    def keyboard_handler(self, *a):
+        if keyboard.is_pressed('Alt') and not self.is_won and not self.text():
+            self.setText(self.name)
+            self.setIcon(QIcon())
+            return
+        elif not keyboard.is_pressed('Alt') and self.text():
+            self.setText('')
+            self.setIcon(QIcon(self.pixmap))
 
     # returns True if can move
     def can_move(self) -> bool:
@@ -129,11 +148,13 @@ class Plate(QPushButton):
                 # showing message box
                 QMessageBox.about(self, 'Вы выиграли!!! НОВЫЙ РЕКОРД!!!',
                                   f'Победа! Время: {self.time_counter / 10} секунд!'
-                                  f'\nНовый рекорд!')
+                                  f'\nНовый рекорд {plates_width}x{plates_height}!')
             else:
                 # showing message box if not new record
                 QMessageBox.about(self, 'Вы выиграли!!!', f'Победа! Время: {self.time_counter / 10} секунд!')
             self.time_counter = 0
+        self.mainWindow.timeLabel.resize(MAIN_FONT.pointSize() * len(self.mainWindow.timeLabel.text()),
+                                         MAIN_FONT.pointSize() + 5)
 
         # stop timer condition
         if not Plate.is_started or Plate.is_won:
